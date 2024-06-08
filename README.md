@@ -1,4 +1,4 @@
-# Anomaly Detection on Metal Surface
+# Anomaly Detection
 
 This project aims to develop a neural network-based classifier to detect anomalies (scratches) on metal surfaces using PyTorch. The dataset consists of images of metal surfaces categorized into two classes: `clean` and `faulty`.
 
