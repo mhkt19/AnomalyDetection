@@ -13,6 +13,11 @@ from PIL import Image
 
 # Set the train size ratio
 train_size_ratio = 0.8
+# Set the minimum and maximum number of epochs
+min_epochs = 5
+max_epochs = 15
+# Set the patience for early stopping
+patience = 3
 
 # Function to create directories for the current run
 def create_timestamped_folders(base_dir):
@@ -95,6 +100,7 @@ model = Classifier()
 # Set Up Training Components
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
+scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=patience, factor=0.1)
 
 # Move the model to GPU if available
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -105,9 +111,11 @@ if torch.cuda.is_available():
 model.to(device)
 
 # Training and Validation Loop
-num_epochs = 10
+best_val_loss = float('inf')
+epochs_no_improve = 0
+best_model_wts = None
 
-for epoch in range(num_epochs):
+for epoch in range(max_epochs):
     # Training phase
     model.train()
     running_loss = 0.0
@@ -135,7 +143,7 @@ for epoch in range(num_epochs):
     epoch_loss = running_loss / len(train_dataset)
     epoch_acc = running_corrects.double() / len(train_dataset)
 
-    print(f"Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss:.4f}, Accuracy: {epoch_acc:.4f}")
+    print(f"Epoch {epoch+1}/{max_epochs}, Loss: {epoch_loss:.4f}, Accuracy: {epoch_acc:.4f}")
 
     # Validation phase
     model.eval()
@@ -157,6 +165,25 @@ for epoch in range(num_epochs):
     val_epoch_acc = val_running_corrects.double() / len(val_dataset)
 
     print(f"Validation Loss: {val_epoch_loss:.4f}, Validation Accuracy: {val_epoch_acc:.4f}")
+
+    # Step the scheduler
+    scheduler.step(val_epoch_loss)
+
+    # Check early stopping condition
+    if val_epoch_loss < best_val_loss:
+        best_val_loss = val_epoch_loss
+        epochs_no_improve = 0
+        best_model_wts = model.state_dict()  # Save the best model weights
+    else:
+        epochs_no_improve += 1
+
+    if epoch >= min_epochs and epochs_no_improve >= patience:
+        print(f"Early stopping at epoch {epoch+1}")
+        break
+
+# Load best model weights
+if best_model_wts is not None:
+    model.load_state_dict(best_model_wts)
 
 # Save the trained model
 torch.save(model.state_dict(), os.path.join(run_dir, 'model.pth'))
@@ -226,3 +253,4 @@ with open(metrics_file, 'w') as f:
     f.write(f"Test Accuracy: {test_acc * 100:.2f}%\n")
     f.write(f"Confusion Matrix:\n{conf_matrix}\n")
     f.write(f"Precision: {precision * 100:.2f}%\n")
+    f.write(f"Recall: {recall * 100:.2f}%\n")
