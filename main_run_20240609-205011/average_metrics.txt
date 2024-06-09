@@ -1,0 +1,9 @@
+Average Train Accuracy: 96.22%
+Average Test Accuracy: 95.43%
+Average Confusion Matrix:
+[[ 28.2   1.8]
+ [  7.8 172.2]]
+Average Precision: 98.96%
+Average Recall: 95.67%
+Average Duration: 397.12 seconds
+Average Max Memory Usage: 1111.61 MB

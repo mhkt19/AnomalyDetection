@@ -1,0 +1,9 @@
+Train Accuracy: 85.10%
+Test Accuracy: 83.81%
+Confusion Matrix:
+[[ 30   0]
+ [ 34 146]]
+Precision: 100.00%
+Recall: 81.11%
+Duration: 342.55 seconds
+Max Memory Usage: 1072.89 MB
