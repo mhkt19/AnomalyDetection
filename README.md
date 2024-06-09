@@ -45,7 +45,7 @@ Examples of faulty surface
 
 
 ## Result:
-After training, the evaluation metrics such as accuracy, precision, recall, and confusion matrix are saved in metrics.txt.
+After training, the evaluation metrics such as accuracy, precision, recall, and confusion matrix are saved in metrics.txt. Since the train/test data is selected randomly in each run, the results are not deterministic across multiple runs. However, in most runs, the model achieves 100% accuracy on both the train and test data.
 
 ## Contributing:
 Feel free to contribute to this project by opening issues or submitting pull requests.
